@@ -34,6 +34,8 @@ class Heroku::Command::Sightglass < Heroku::Command::Base
   def read_logs(url)
     uri  = URI.parse(url)
     http = Net::HTTP.new(uri.host, uri.port)
+    get = Net::HTTP::Get.new(uri.path + (uri.query ? "?" + uri.query : ""))
+    get.basic_auth uri.user, uri.password
     if uri.scheme == "https"
       http.use_ssl = true
       if ENV["HEROKU_SSL_VERIFY"] == "disable"
@@ -45,7 +47,7 @@ class Heroku::Command::Sightglass < Heroku::Command::Base
     http.read_timeout = 60 * 60
     begin
       http.start do
-        http.request_get(uri.path + (uri.query ? "?" + uri.query : "")) do |request|
+        http.request(get) do |request|
           request.read_body do |chunk|
             chunk = chunk.strip
             if chunk != ""
