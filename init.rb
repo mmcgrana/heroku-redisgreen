@@ -17,7 +17,7 @@ class Heroku::Command::Redisgreen < Heroku::Command::Base
     url = extract_url
     uri = URI.parse(url)
     begin
-      exec "redis-cli -a #{uri.password} -h #{uri.user} -h #{uri.host} -p #{uri.port}"
+      exec "redis-cli -a #{uri.password} -h #{uri.host} -p #{uri.port}"
     rescue Errno::ENOENT
       error("The redis-cli command is not available - please install it and try again.")
     end
