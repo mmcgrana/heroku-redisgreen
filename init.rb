@@ -7,17 +7,23 @@ class Heroku::Command::Redisgreen < Heroku::Command::Base
   #
   # open a redis-cli session for the database
   #
-  #Example:
+  #Example (interactive CLI):
   #
   # $ heroku redisgreen:cli -a my-app
   # redis smart-dandelion-4.redisgreen.net:11035>
   #
+  #Example (single-command mode):
+  #
+  # $ heroku redisgreen:cli -a my-app SET mykey "hello world"
+  # OK
+  # $ heroku redisgreen:cli -a my-app GET mykey
+  # "hello world"
+  #
   def cli
-    validate_arguments!
     url = extract_url
     uri = URI.parse(url)
     begin
-      exec "redis-cli -a #{uri.password} -h #{uri.host} -p #{uri.port}"
+      exec("redis-cli", "-a", uri.password, "-h", uri.host, "-p", uri.port.to_s, *args)
     rescue Errno::ENOENT
       error("The redis-cli command is not available - please install it and try again.")
     end
